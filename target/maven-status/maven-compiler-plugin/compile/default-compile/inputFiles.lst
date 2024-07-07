@@ -6,7 +6,6 @@ C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\exceptions\DebtNotFoundException.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\exceptions\GlobalExceptionHandler.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\exceptions\UserNotFoundException.java
-C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\filters\JwtRequestFilter.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\mapper\DebtMapper.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\mapper\UserMapper.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\model\dto\DebtRequestDTO.java
@@ -30,6 +29,5 @@ C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\security\TokenResponse.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\security\WebConfig.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\services\DebtService.java
-C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\services\TokenService.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\services\UserService.java
 C:\Users\Fernando\Desktop\debt-reminder-api-rest\src\main\java\com\sunsett\debt_reminder\util\JwtUtil.java

@@ -20,4 +20,5 @@ public class DebtResponseDTO {
     private BigDecimal amount;
     private boolean status;
     private LocalDateTime createdDate;
+    private String color;
 }

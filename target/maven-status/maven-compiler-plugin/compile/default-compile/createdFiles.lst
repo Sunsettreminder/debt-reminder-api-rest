@@ -14,10 +14,8 @@ com\sunsett\debt_reminder\services\UserService.class
 com\sunsett\debt_reminder\security\TokenResponse.class
 com\sunsett\debt_reminder\security\LoginRequest.class
 com\sunsett\debt_reminder\model\entities\Debt.class
-com\sunsett\debt_reminder\filters\JwtRequestFilter.class
 com\sunsett\debt_reminder\model\entities\User.class
 com\sunsett\debt_reminder\mapper\DebtMapper.class
-com\sunsett\debt_reminder\services\TokenService.class
 com\sunsett\debt_reminder\repository\DebtRepository.class
 com\sunsett\debt_reminder\model\entities\User$UserBuilder.class
 com\sunsett\debt_reminder\security\TokenResponse$TokenResponseBuilder.class

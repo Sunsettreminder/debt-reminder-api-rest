@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (tokenBlackList.isTokenBlacklisted(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token invalido");
+                response.getWriter().write("Token invalido, lo siento mucho");
                 return;
             }
 
@@ -70,3 +70,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
+

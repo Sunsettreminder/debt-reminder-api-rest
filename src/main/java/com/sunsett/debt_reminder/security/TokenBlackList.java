@@ -1,17 +1,19 @@
 package com.sunsett.debt_reminder.security;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
-@Component
+
+@Service
 public class TokenBlackList {
-    private final Set<String> blacklist = new HashSet<>();
+    private Set<String> blacklistedTokens = new HashSet<>();
 
     public void addToken(String token) {
-        blacklist.add(token);
+        blacklistedTokens.add(token);
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return blacklist.contains(token);
+        return blacklistedTokens.contains(token);
     }
 }

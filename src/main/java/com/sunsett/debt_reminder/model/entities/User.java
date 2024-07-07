@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
 @Getter
 @Setter
 @Builder
@@ -33,6 +33,10 @@ public class User implements UserDetails {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true) // Lista de deudas del usuario
+    private List<Debt> debts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
