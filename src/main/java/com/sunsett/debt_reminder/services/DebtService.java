@@ -4,20 +4,16 @@ import com.sunsett.debt_reminder.exceptions.DebtAlreadyExistsException;
 import com.sunsett.debt_reminder.exceptions.DebtNotFoundException;
 import com.sunsett.debt_reminder.model.dto.DebtRequestDTO;
 import com.sunsett.debt_reminder.model.dto.DebtResponseDTO;
-import com.sunsett.debt_reminder.model.entities.Debt;
-import com.sunsett.debt_reminder.model.entities.User;
-import com.sunsett.debt_reminder.model.entities.InvoiceDebt;
-import com.sunsett.debt_reminder.model.entities.ServiceDebt;
-import com.sunsett.debt_reminder.model.entities.TaxDebt;
-import com.sunsett.debt_reminder.model.entities.InstallmentDebt;
+import com.sunsett.debt_reminder.model.entities.*;
 import com.sunsett.debt_reminder.repository.DebtRepository;
 import com.sunsett.debt_reminder.repository.UserRepository;
 import com.sunsett.debt_reminder.mapper.DebtMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,5 +88,38 @@ public class DebtService {
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
         debtRepository.delete(debt);
+    }
+
+    // Nuevo método para obtener deudas de un mes específico
+    public List<DebtResponseDTO> getDebtsForMonth(Long userId, YearMonth month) {
+        LocalDate startOfMonth = month.atDay(1);
+        LocalDate endOfMonth = month.atEndOfMonth();
+
+        // Obtener todas las deudas del mes y las deudas no pagadas de meses anteriores
+        List<Debt> debts = debtRepository.findByUserIdAndDueDateBetweenOrStatusIsFalseAndUserId(userId, startOfMonth, endOfMonth, userId);
+
+        return debts.stream()
+                .map(debt -> {
+                    DebtResponseDTO dto = debtMapper.convertToDto(debt);
+                    dto.setColor(determineColor(debt));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private String determineColor(Debt debt) {
+        LocalDate today = LocalDate.now();
+        LocalDate dueDate = debt.getDueDate();
+        boolean isPaid = debt.isStatus();
+
+        if (isPaid) {
+            return "GREEN";
+        } else if (dueDate.isBefore(today)) {
+            return "RED";
+        } else if (dueDate.isBefore(today.plusWeeks(1))) {
+            return "YELLOW";
+        } else {
+            return "BLACK";
+        }
     }
 }
