@@ -55,4 +55,16 @@ public class DebtController {
         debtService.deleteDebt(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/mark-as-paid")
+    public ResponseEntity<DebtResponseDTO> markDebtAsPaid(@PathVariable Long id) {
+        DebtResponseDTO updatedDebt = debtService.markAsPaid(id);
+        return ResponseEntity.ok(updatedDebt);
+    }
+
+    @GetMapping("/user/{userId}/unpaid-overdue")
+    public ResponseEntity<List<DebtResponseDTO>> getUnpaidOverdueDebts(@PathVariable Long userId) {
+        List<DebtResponseDTO> debts = debtService.getUnpaidOverdueDebts(userId);
+        return ResponseEntity.ok(debts);
+    }
 }

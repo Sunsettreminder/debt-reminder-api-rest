@@ -107,6 +107,15 @@ public class DebtService {
                 .collect(Collectors.toList());
     }
 
+    public List<DebtResponseDTO> getUnpaidOverdueDebts(Long userId) {
+        LocalDate today = LocalDate.now();
+
+        List<Debt> debts = debtRepository.findByUserIdAndStatusFalseAndDueDateBefore(userId, today);
+        return debts.stream()
+                .map(debtMapper::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     private String determineColor(Debt debt) {
         LocalDate today = LocalDate.now();
         LocalDate dueDate = debt.getDueDate();
@@ -116,10 +125,24 @@ public class DebtService {
             return "GREEN";
         } else if (dueDate.isBefore(today)) {
             return "RED";
-        } else if (dueDate.isBefore(today.plusWeeks(1))) {
+        } else if (!dueDate.isBefore(today) && dueDate.isBefore(today.plusDays(7))) {
             return "YELLOW";
         } else {
             return "BLACK";
         }
+    }
+
+    // Nuevo método para marcar una deuda como pagada
+    public DebtResponseDTO markAsPaid(Long debtId) {
+        Debt debt = debtRepository.findById(debtId)
+                .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
+
+        if (debt.isStatus()) {
+            throw new IllegalArgumentException("La deuda ya está marcada como pagada");
+        }
+
+        debt.setStatus(true);
+        Debt updatedDebt = debtRepository.save(debt);
+        return debtMapper.convertToDto(updatedDebt);
     }
 }
