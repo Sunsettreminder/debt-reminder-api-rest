@@ -17,29 +17,29 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Debt {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Id de deuda
     private long debtId;
 
-    @Column(name = "document_number", nullable = false)
+    @Column(name = "document_number", nullable = false) // Num. documento de deuda
     private String documentNumber;
 
-    @Column(name = "company", nullable = false)
+    @Column(name = "company", nullable = false) // Empresa de la deuda
     private String company;
 
-    @Column(name = "due_date", nullable = false)
+    @Column(name = "due_date", nullable = false) // Fecha de vencimiento de la deuda
     private LocalDate dueDate;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(name = "created_date", nullable = false) // Fecha de creación de la deuda
     private LocalDateTime createdDate;
 
-    @Column(name = "amount", nullable = false)
+    @Column(name = "amount", nullable = false) // Monto de la deuda
     private BigDecimal amount;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false) // Estado de la deuda
     private boolean status; // true si esta Pagada, false si esta Pendiente
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false) // Usuario de la deuda
     private User user;
 
     @PrePersist
