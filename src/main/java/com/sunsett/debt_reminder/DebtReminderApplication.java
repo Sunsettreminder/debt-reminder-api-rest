@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class DebtReminderApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(DebtReminderApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(DebtReminderApplication.class, args);
+    }
 }

@@ -1,6 +1,4 @@
-package com.sunsett.debt_reminder.documentation;
-
-/*  ========================================
+ *  ========================================
  *  | Estructura del proyecto DebtReminder |
  *  ========================================
  *
@@ -53,5 +51,3 @@ package com.sunsett.debt_reminder.documentation;
  *          git add .
  *          git commit -m "(COMENTARIO)"
  *          git push origin (RAMA)
- *
- */
