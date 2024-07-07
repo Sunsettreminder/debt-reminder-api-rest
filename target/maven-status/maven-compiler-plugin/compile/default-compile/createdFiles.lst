@@ -2,6 +2,7 @@ com\sunsett\debt_reminder\model\dto\DebtRequestDTO.class
 com\sunsett\debt_reminder\services\DebtService.class
 com\sunsett\debt_reminder\util\JwtUtil.class
 com\sunsett\debt_reminder\DebtReminderApplication.class
+com\sunsett\debt_reminder\events\DebtEventListener.class
 com\sunsett\debt_reminder\model\entities\InstallmentDebt.class
 com\sunsett\debt_reminder\security\ApplicationConfig.class
 com\sunsett\debt_reminder\model\dto\UserAuthDTO.class
@@ -12,6 +13,7 @@ com\sunsett\debt_reminder\security\JwtService.class
 com\sunsett\debt_reminder\security\LoginRequest$LoginRequestBuilder.class
 com\sunsett\debt_reminder\services\UserService.class
 com\sunsett\debt_reminder\security\TokenResponse.class
+com\sunsett\debt_reminder\model\entities\Notification.class
 com\sunsett\debt_reminder\security\LoginRequest.class
 com\sunsett\debt_reminder\model\entities\Debt.class
 com\sunsett\debt_reminder\model\entities\User.class
@@ -23,14 +25,18 @@ com\sunsett\debt_reminder\controllers\UserController.class
 com\sunsett\debt_reminder\config\ModelMapperConfig.class
 com\sunsett\debt_reminder\security\JwtAuthenticationFilter.class
 com\sunsett\debt_reminder\mapper\UserMapper.class
+com\sunsett\debt_reminder\controllers\NotificationController.class
 com\sunsett\debt_reminder\model\entities\ServiceDebt.class
 com\sunsett\debt_reminder\security\WebConfig.class
 com\sunsett\debt_reminder\exceptions\UserNotFoundException.class
 com\sunsett\debt_reminder\security\SecurityConfig.class
 com\sunsett\debt_reminder\controllers\DebtController.class
+com\sunsett\debt_reminder\services\NotificationService.class
 com\sunsett\debt_reminder\repository\UserRepository.class
 com\sunsett\debt_reminder\exceptions\GlobalExceptionHandler.class
 com\sunsett\debt_reminder\model\dto\DebtResponseDTO.class
 com\sunsett\debt_reminder\model\entities\TaxDebt.class
 com\sunsett\debt_reminder\exceptions\DebtAlreadyExistsException.class
+com\sunsett\debt_reminder\model\dto\NotificationResponseDTO.class
+com\sunsett\debt_reminder\repository\NotificationRepository.class
 com\sunsett\debt_reminder\model\entities\InvoiceDebt.class

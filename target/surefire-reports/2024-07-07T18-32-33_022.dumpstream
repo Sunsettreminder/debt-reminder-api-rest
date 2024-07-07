@@ -1,0 +1,5 @@
+# Created at 2024-07-07T18:32:33.163
+Boot Manifest-JAR contains absolute paths in classpath 'D:\GITHUB\ProyectoInso2\user-auth\debt-reminder-api-rest\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

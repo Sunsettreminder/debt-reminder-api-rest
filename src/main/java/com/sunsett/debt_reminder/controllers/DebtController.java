@@ -62,9 +62,39 @@ public class DebtController {
         return ResponseEntity.ok(updatedDebt);
     }
 
+    @PutMapping("/{id}/mark-as-unpaid")
+    public ResponseEntity<DebtResponseDTO> markDebtAsUnpaid(@PathVariable Long id) {
+        DebtResponseDTO updatedDebt = debtService.markAsUnpaid(id);
+        return ResponseEntity.ok(updatedDebt);
+    }
+
     @GetMapping("/user/{userId}/unpaid-overdue")
     public ResponseEntity<List<DebtResponseDTO>> getUnpaidOverdueDebts(@PathVariable Long userId) {
         List<DebtResponseDTO> debts = debtService.getUnpaidOverdueDebts(userId);
+        return ResponseEntity.ok(debts);
+    }
+
+    @GetMapping("/user/{userId}/current-week")
+    public ResponseEntity<List<DebtResponseDTO>> getDebtsForCurrentWeek(@PathVariable Long userId) {
+        List<DebtResponseDTO> debts = debtService.getDebtsForCurrentWeek(userId);
+        return ResponseEntity.ok(debts);
+    }
+
+    @GetMapping("/user/{userId}/paid")
+    public ResponseEntity<List<DebtResponseDTO>> getPaidDebts(@PathVariable Long userId) {
+        List<DebtResponseDTO> debts = debtService.getPaidDebts(userId);
+        return ResponseEntity.ok(debts);
+    }
+
+    @GetMapping("/user/{userId}/future")
+    public ResponseEntity<List<DebtResponseDTO>> getFutureDebts(@PathVariable Long userId) {
+        List<DebtResponseDTO> debts = debtService.getFutureDebts(userId);
+        return ResponseEntity.ok(debts);
+    }
+
+    @GetMapping("/user/{userId}/unpaid")
+    public ResponseEntity<List<DebtResponseDTO>> getUnpaidDebts(@PathVariable Long userId) {
+        List<DebtResponseDTO> debts = debtService.getUnpaidDebts(userId);
         return ResponseEntity.ok(debts);
     }
 }

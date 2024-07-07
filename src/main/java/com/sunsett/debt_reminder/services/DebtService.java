@@ -9,6 +9,7 @@ import com.sunsett.debt_reminder.repository.DebtRepository;
 import com.sunsett.debt_reminder.repository.UserRepository;
 import com.sunsett.debt_reminder.mapper.DebtMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,6 +29,9 @@ public class DebtService {
     @Autowired
     private DebtMapper debtMapper;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     public DebtResponseDTO saveDebt(Long userId, DebtRequestDTO debtRequestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DebtNotFoundException("Usuario no encontrado"));
@@ -40,6 +44,7 @@ public class DebtService {
         Debt debt = debtMapper.convertToEntity(debtRequestDTO);
         debt.setUser(user);
         Debt savedDebt = debtRepository.save(debt);
+        eventPublisher.publishEvent(savedDebt);
         return mapAndDetermineColor(savedDebt);
     }
 
@@ -72,7 +77,6 @@ public class DebtService {
         return dto;
     }
 
-
     public DebtResponseDTO updateDebt(Long debtId, DebtRequestDTO debtRequestDTO) {
         Debt existingDebt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
@@ -84,6 +88,7 @@ public class DebtService {
         existingDebt.setStatus(debtRequestDTO.isStatus());
 
         Debt updatedDebt = debtRepository.save(existingDebt);
+        eventPublisher.publishEvent(updatedDebt);
         return mapAndDetermineColor(updatedDebt);
     }
 
@@ -91,6 +96,7 @@ public class DebtService {
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
         debtRepository.delete(debt);
+        eventPublisher.publishEvent(debt);
     }
 
     // Nuevo método para obtener deudas de un mes específico
@@ -98,7 +104,6 @@ public class DebtService {
         LocalDate startOfMonth = month.atDay(1);
         LocalDate endOfMonth = month.atEndOfMonth();
 
-        // Obtener solo las deudas del mes especificado
         List<Debt> debts = debtRepository.findByUserIdAndDueDateBetween(userId, startOfMonth, endOfMonth);
 
         return debts.stream()
@@ -110,7 +115,7 @@ public class DebtService {
                 .collect(Collectors.toList());
     }
 
-
+    // Deudas no pagadas y vencidas (Rojas)
     public List<DebtResponseDTO> getUnpaidOverdueDebts(Long userId) {
         LocalDate today = LocalDate.now();
 
@@ -120,7 +125,49 @@ public class DebtService {
                 .collect(Collectors.toList());
     }
 
-    // Nuevo método para marcar una deuda como pagada
+    // Deudas de la semana actual (Amarillas)
+    public List<DebtResponseDTO> getDebtsForCurrentWeek(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate endOfWeek = today.plusDays(7);
+
+        List<Debt> debts = debtRepository.findByUserIdAndStatusFalseAndDueDateBetween(userId, today, endOfWeek);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    // Deudas pagadas (Verdes)
+    public List<DebtResponseDTO> getPaidDebts(Long userId) {
+        List<Debt> debts = debtRepository.findByUserIdAndStatusTrue(userId);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    // Deudas futuras (Negras)
+    public List<DebtResponseDTO> getFutureDebts(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate endOfWeek = today.plusDays(7);
+
+        List<Debt> allFutureDebts = debtRepository.findByUserIdAndStatusFalseAndDueDateAfter(userId, today);
+        List<Debt> futureDebtsExcludingCurrentWeek = allFutureDebts.stream()
+                .filter(debt -> debt.getDueDate().isAfter(endOfWeek))
+                .collect(Collectors.toList());
+
+        return futureDebtsExcludingCurrentWeek.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    // Deudas no Pagadas (antiguas, actuales, futuras)
+    public List<DebtResponseDTO> getUnpaidDebts(Long userId) {
+        List<Debt> debts = debtRepository.findByUserIdAndStatusFalse(userId);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    // Método para marcar una deuda como pagada
     public DebtResponseDTO markAsPaid(Long debtId) {
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
@@ -130,6 +177,20 @@ public class DebtService {
         }
 
         debt.setStatus(true);
+        Debt updatedDebt = debtRepository.save(debt);
+        return mapAndDetermineColor(updatedDebt);
+    }
+
+    // Método para marcar una deuda como no pagada
+    public DebtResponseDTO markAsUnpaid(Long debtId) {
+        Debt debt = debtRepository.findById(debtId)
+                .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
+
+        if (debt.isStatus()) {
+            throw new IllegalArgumentException("La deuda ya está marcada como pagada");
+        }
+
+        debt.setStatus(false);
         Debt updatedDebt = debtRepository.save(debt);
         return mapAndDetermineColor(updatedDebt);
     }
@@ -156,4 +217,3 @@ public class DebtService {
         }
     }
 }
-

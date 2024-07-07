@@ -27,9 +27,9 @@ public class UserController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<TokenResponse> registrar(@RequestBody User usuario) {
-        TokenResponse token = usuarioService.addUsuario(usuario);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<String> registrar(@RequestBody User usuario) {
+        usuarioService.addUsuario(usuario);
+        return ResponseEntity.ok("Usuario registrado exitosamente");
     }
 
     @PostMapping("/logout")
@@ -46,6 +46,3 @@ public class UserController {
         return ResponseEntity.ok("Hola, estás autenticado");
     }
 }
-
-
-

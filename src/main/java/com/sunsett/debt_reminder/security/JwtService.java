@@ -18,10 +18,9 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
 
-    public String getToken(UserDetails user, User usuario) {
+    public String getToken(UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", usuario.getId());
-        claims.put("username", usuario.getUsername());
+        claims.put("username", user.getUsername());
 
         return generateToken(claims, user.getUsername());
     }
@@ -31,7 +30,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 10 horas de validez
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 horas de validez
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -61,11 +60,6 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    public <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = getAllClaimsFromToken(token);
-        return claimsResolver.apply(claims);
     }
 
     private boolean isTokenExpired(String token) {
