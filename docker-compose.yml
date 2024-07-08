@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: debtreminderdb
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: qq18857267
+      POSTGRES_PASSWORD: 1234
     ports:
       - "5432:5432"
   app:
