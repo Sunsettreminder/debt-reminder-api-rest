@@ -186,8 +186,8 @@ public class DebtService {
         Debt debt = debtRepository.findById(debtId)
                 .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
 
-        if (debt.isStatus()) {
-            throw new IllegalArgumentException("La deuda ya está marcada como pagada");
+        if (!debt.isStatus()) {
+            throw new IllegalArgumentException("La deuda ya está marcada como no pagada");
         }
 
         debt.setStatus(false);
