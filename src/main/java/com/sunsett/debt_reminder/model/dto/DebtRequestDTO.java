@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,4 +38,6 @@ public class DebtRequestDTO {
     private BigDecimal cuota;
     private int daysBetweenInstallments;
     private int numberOfInstallments;
+    private List<InstallmentDTO> installments; // Asegúrate de tener este campo
+
 }

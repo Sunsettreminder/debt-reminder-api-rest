@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Embeddable
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Installment {
-    private BigDecimal amount;
     private LocalDate dueDate;
+    private BigDecimal amount;
 }

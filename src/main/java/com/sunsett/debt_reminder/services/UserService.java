@@ -24,23 +24,18 @@ public class UserService {
     public TokenResponse login(LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         User user = usuarioRepository.findByUsername(request.getUsername()).orElseThrow();
-        String token = jwtService.getToken(user, user);
+        String token = jwtService.getToken(user);
         return TokenResponse.builder()
                 .token(token)
                 .build();
     }
 
-    public TokenResponse addUsuario(User usuario) {
+    public void addUsuario(User usuario) {
         User user = User.builder()
                 .username(usuario.getUsername())
                 .password(passwordEncoder.encode(usuario.getPassword()))
                 .email(usuario.getEmail())
                 .build();
-
         usuarioRepository.save(user);
-        String token = jwtService.getToken(user, user);
-        return TokenResponse.builder()
-                .token(token)
-                .build();
     }
 }

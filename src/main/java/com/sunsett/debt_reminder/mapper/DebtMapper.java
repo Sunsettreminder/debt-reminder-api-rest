@@ -18,6 +18,10 @@ public class DebtMapper {
     private ModelMapper modelMapper;
 
     public Debt convertToEntity(DebtRequestDTO debtRequestDTO) {
+        if (debtRequestDTO == null) {
+            throw new IllegalArgumentException("DebtRequestDTO cannot be null");
+        }
+
         Debt debt;
         switch (debtRequestDTO.getDebtType().toUpperCase()) {
             case "INVOICE":
@@ -33,19 +37,44 @@ public class DebtMapper {
                 debt = modelMapper.map(debtRequestDTO, InstallmentDebt.class);
                 break;
             default:
-                throw new IllegalArgumentException("Tipo de deuda no válido: " + debtRequestDTO.getDebtType());
+                throw new IllegalArgumentException("Invalid debt type: " + debtRequestDTO.getDebtType());
         }
+        System.out.println("Debt convertido: " + debt);
         return debt;
     }
 
     public DebtResponseDTO convertToDto(Debt debt) {
+        if (debt == null) {
+            throw new IllegalArgumentException("Debt cannot be null");
+        }
+
         DebtResponseDTO debtResponseDTO = modelMapper.map(debt, DebtResponseDTO.class);
         debtResponseDTO.setColor(determineColor(debt));
+        if (debt instanceof TaxDebt) {
+            if (((TaxDebt) debt).getInstallments() != null) {
+                debtResponseDTO.setInstallments(modelMapper.map(((TaxDebt) debt).getInstallments(), new org.modelmapper.TypeToken<List<InstallmentDTO>>() {}.getType()));
+            } else {
+                System.out.println("Instalments are null for debt: " + debt);
+            }
+        }
+        System.out.println("DebtResponseDTO convertido: " + debtResponseDTO);
         return debtResponseDTO;
     }
 
     public void updateDebtFromDto(DebtRequestDTO debtRequestDTO, Debt debt) {
+        if (debtRequestDTO == null || debt == null) {
+            throw new IllegalArgumentException("DebtRequestDTO and Debt cannot be null");
+        }
+
         modelMapper.map(debtRequestDTO, debt);
+        if (debt instanceof TaxDebt) {
+            if (debtRequestDTO.getInstallments() != null) {
+                ((TaxDebt) debt).setInstallments(modelMapper.map(debtRequestDTO.getInstallments(), new org.modelmapper.TypeToken<List<Installment>>() {}.getType()));
+            } else {
+                System.out.println("Instalments in DebtRequestDTO are null: " + debtRequestDTO);
+            }
+        }
+        System.out.println("Debt actualizado desde DTO: " + debt);
     }
 
     private String determineColor(Debt debt) {

@@ -9,6 +9,7 @@ import com.sunsett.debt_reminder.repository.DebtRepository;
 import com.sunsett.debt_reminder.repository.UserRepository;
 import com.sunsett.debt_reminder.mapper.DebtMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,6 +31,9 @@ public class DebtService {
 
     @Autowired
     private DebtMapper debtMapper;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<DebtResponseDTO> saveDebt(Long userId, DebtRequestDTO debtRequestDTO) {
         System.out.println("Inicio de saveDebt");
@@ -55,9 +59,16 @@ public class DebtService {
             int daysBetweenInstallments = debtRequestDTO.getDaysBetweenInstallments();
             LocalDate dueDate = debtRequestDTO.getDueDate();
 
+            // Calcular la cuota usando la fórmula del valor presente de una anualidad
+            BigDecimal monthlyInterestRate = annualInterestRate.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP)
+                    .divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP);
+            BigDecimal onePlusRate = BigDecimal.ONE.add(monthlyInterestRate);
+            BigDecimal pow = onePlusRate.pow(numInstallments);
+            BigDecimal installmentAmount = principal.multiply(monthlyInterestRate).multiply(pow)
+                    .divide(pow.subtract(BigDecimal.ONE), 2, RoundingMode.HALF_UP);
+
             for (int i = 0; i < numInstallments; i++) {
-                BigDecimal interest = principal.multiply(annualInterestRate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP).divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
-                BigDecimal installmentAmount = debtRequestDTO.getCuota();
+                BigDecimal interest = principal.multiply(monthlyInterestRate).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal capital = installmentAmount.subtract(interest);
 
                 InstallmentDebt installmentDebt = (InstallmentDebt) debtMapper.convertToEntity(debtRequestDTO);
@@ -66,6 +77,7 @@ public class DebtService {
                 installmentDebt.setCapital(capital);
                 installmentDebt.setInteres(interest);
                 installmentDebt.setCuota(installmentAmount);
+                installmentDebt.setAmount(installmentAmount); // Set the amount to the installment amount
                 installmentDebt.setDocumentNumber(debtRequestDTO.getDocumentNumber() + "-" + (i + 1));
                 debtsToSave.add(installmentDebt);
 
@@ -77,6 +89,7 @@ public class DebtService {
                 taxDebt.setUser(user);
                 taxDebt.setDueDate(debtRequestDTO.getDueDate().plusMonths(i));
                 taxDebt.setDocumentNumber(debtRequestDTO.getDocumentNumber() + "-" + (i + 1));
+                taxDebt.setAmount(debtRequestDTO.getAmount().divide(BigDecimal.valueOf(debtRequestDTO.getNumberOfInstallments()), 2, RoundingMode.HALF_UP)); // Set the amount to the installment amount
                 debtsToSave.add(taxDebt);
             }
         } else {
@@ -117,17 +130,62 @@ public class DebtService {
     public List<DebtResponseDTO> getDebtsForMonth(Long userId, YearMonth month) {
         LocalDate startOfMonth = month.atDay(1);
         LocalDate endOfMonth = month.atEndOfMonth();
+
         List<Debt> debts = debtRepository.findByUserIdAndDueDateBetween(userId, startOfMonth, endOfMonth);
+
         return debts.stream()
-                .map(debtMapper::convertToDto)
+                .map(debt -> {
+                    DebtResponseDTO dto = debtMapper.convertToDto(debt);
+                    dto.setColor(determineColor(debt));
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     public List<DebtResponseDTO> getUnpaidOverdueDebts(Long userId) {
         LocalDate today = LocalDate.now();
+
         List<Debt> debts = debtRepository.findByUserIdAndStatusFalseAndDueDateBefore(userId, today);
         return debts.stream()
-                .map(debtMapper::convertToDto)
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    public List<DebtResponseDTO> getDebtsForCurrentWeek(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate endOfWeek = today.plusDays(7);
+
+        List<Debt> debts = debtRepository.findByUserIdAndStatusFalseAndDueDateBetween(userId, today, endOfWeek);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    public List<DebtResponseDTO> getPaidDebts(Long userId) {
+        List<Debt> debts = debtRepository.findByUserIdAndStatusTrue(userId);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    public List<DebtResponseDTO> getFutureDebts(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate endOfWeek = today.plusDays(7);
+
+        List<Debt> allFutureDebts = debtRepository.findByUserIdAndStatusFalseAndDueDateAfter(userId, today);
+        List<Debt> futureDebtsExcludingCurrentWeek = allFutureDebts.stream()
+                .filter(debt -> debt.getDueDate().isAfter(endOfWeek))
+                .collect(Collectors.toList());
+
+        return futureDebtsExcludingCurrentWeek.stream()
+                .map(this::mapAndDetermineColor)
+                .collect(Collectors.toList());
+    }
+
+    public List<DebtResponseDTO> getUnpaidDebts(Long userId) {
+        List<Debt> debts = debtRepository.findByUserIdAndStatusFalse(userId);
+        return debts.stream()
+                .map(this::mapAndDetermineColor)
                 .collect(Collectors.toList());
     }
 
@@ -142,5 +200,40 @@ public class DebtService {
         debt.setStatus(true);
         Debt updatedDebt = debtRepository.save(debt);
         return debtMapper.convertToDto(updatedDebt);
+    }
+
+    public DebtResponseDTO markAsUnpaid(Long debtId) {
+        Debt debt = debtRepository.findById(debtId)
+                .orElseThrow(() -> new DebtNotFoundException("Deuda no encontrada"));
+
+        if (!debt.isStatus()) {
+            throw new IllegalArgumentException("La deuda ya está marcada como no pagada");
+        }
+
+        debt.setStatus(false);
+        Debt updatedDebt = debtRepository.save(debt);
+        return mapAndDetermineColor(updatedDebt);
+    }
+
+    private DebtResponseDTO mapAndDetermineColor(Debt debt) {
+        DebtResponseDTO debtResponseDTO = debtMapper.convertToDto(debt);
+        debtResponseDTO.setColor(determineColor(debt));
+        return debtResponseDTO;
+    }
+
+    private String determineColor(Debt debt) {
+        LocalDate today = LocalDate.now();
+        LocalDate dueDate = debt.getDueDate();
+        boolean isPaid = debt.isStatus();
+
+        if (isPaid) {
+            return "GREEN";
+        } else if (dueDate.isBefore(today)) {
+            return "RED";
+        } else if (!dueDate.isBefore(today) && dueDate.isBefore(today.plusDays(7))) {
+            return "YELLOW";
+        } else {
+            return "BLACK";
+        }
     }
 }
