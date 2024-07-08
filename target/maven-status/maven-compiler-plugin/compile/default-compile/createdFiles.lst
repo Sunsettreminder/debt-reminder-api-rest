@@ -9,9 +9,11 @@ com\sunsett\debt_reminder\model\dto\UserAuthDTO.class
 com\sunsett\debt_reminder\security\TokenBlackList.class
 com\sunsett\debt_reminder\exceptions\DebtNotFoundException.class
 com\sunsett\debt_reminder\model\dto\UserRequestDTO.class
+com\sunsett\debt_reminder\mapper\DebtMapper$2.class
 com\sunsett\debt_reminder\security\JwtService.class
 com\sunsett\debt_reminder\security\LoginRequest$LoginRequestBuilder.class
 com\sunsett\debt_reminder\services\UserService.class
+com\sunsett\debt_reminder\model\entities\Installment.class
 com\sunsett\debt_reminder\security\TokenResponse.class
 com\sunsett\debt_reminder\model\entities\Notification.class
 com\sunsett\debt_reminder\security\LoginRequest.class
@@ -24,6 +26,7 @@ com\sunsett\debt_reminder\security\TokenResponse$TokenResponseBuilder.class
 com\sunsett\debt_reminder\controllers\UserController.class
 com\sunsett\debt_reminder\config\ModelMapperConfig.class
 com\sunsett\debt_reminder\security\JwtAuthenticationFilter.class
+com\sunsett\debt_reminder\model\dto\InstallmentDTO.class
 com\sunsett\debt_reminder\mapper\UserMapper.class
 com\sunsett\debt_reminder\controllers\NotificationController.class
 com\sunsett\debt_reminder\model\entities\ServiceDebt.class
@@ -37,6 +40,7 @@ com\sunsett\debt_reminder\exceptions\GlobalExceptionHandler.class
 com\sunsett\debt_reminder\model\dto\DebtResponseDTO.class
 com\sunsett\debt_reminder\model\entities\TaxDebt.class
 com\sunsett\debt_reminder\exceptions\DebtAlreadyExistsException.class
+com\sunsett\debt_reminder\mapper\DebtMapper$1.class
 com\sunsett\debt_reminder\model\dto\NotificationResponseDTO.class
 com\sunsett\debt_reminder\repository\NotificationRepository.class
 com\sunsett\debt_reminder\model\entities\InvoiceDebt.class
