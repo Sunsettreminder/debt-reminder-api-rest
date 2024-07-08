@@ -14,4 +14,6 @@ public interface DebtRepository extends JpaRepository<Debt, Long> {
     Optional<Debt> findByDocumentNumberAndUserId(String documentNumber, Long userId);
     List<Debt> findByUserIdAndDueDateBetweenOrStatusIsFalseAndUserId(Long userId, LocalDate startOfMonth, LocalDate endOfMonth, Long userId2);
     List<Debt> findByUserIdAndStatusFalseAndDueDateBefore(Long userId, LocalDate date);
+    List<Debt> findByUserIdAndDueDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+
 }

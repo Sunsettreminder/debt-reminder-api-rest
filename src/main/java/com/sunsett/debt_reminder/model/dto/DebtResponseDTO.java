@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +22,34 @@ public class DebtResponseDTO {
     private boolean status;
     private LocalDateTime createdDate;
     private String color;
+
+    // Campos adicionales para TaxDebt
+    private List<InstallmentDTO> installments;
+
+    // Campos adicionales para InstallmentDebt
+    private BigDecimal capital;
+    private BigDecimal interes;
+    private BigDecimal cuota;
+    private int daysBetweenInstallments;
+
+    // Campos adicionales para mostrar saldo y cuota
+    private BigDecimal remainingAmount;  // Saldo restante
+    private BigDecimal installmentAmount;  // Cuota
+
+    // Getters y Setters para remainingAmount y installmentAmount
+    public BigDecimal getRemainingAmount() {
+        return remainingAmount;
+    }
+
+    public void setRemainingAmount(BigDecimal remainingAmount) {
+        this.remainingAmount = remainingAmount;
+    }
+
+    public BigDecimal getInstallmentAmount() {
+        return installmentAmount;
+    }
+
+    public void setInstallmentAmount(BigDecimal installmentAmount) {
+        this.installmentAmount = installmentAmount;
+    }
 }

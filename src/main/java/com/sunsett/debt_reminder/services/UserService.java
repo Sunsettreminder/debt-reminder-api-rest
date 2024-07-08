@@ -1,34 +1,46 @@
 package com.sunsett.debt_reminder.services;
 
-import com.sunsett.debt_reminder.model.dto.UserAuthDTO;
-import com.sunsett.debt_reminder.model.dto.UserRequestDTO;
 import com.sunsett.debt_reminder.model.entities.User;
 import com.sunsett.debt_reminder.repository.UserRepository;
-import com.sunsett.debt_reminder.exceptions.UserNotFoundException;
-import com.sunsett.debt_reminder.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sunsett.debt_reminder.security.JwtService;
+import com.sunsett.debt_reminder.security.LoginRequest;
+import com.sunsett.debt_reminder.security.TokenBlackList;
+import com.sunsett.debt_reminder.security.TokenResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
+    private final UserRepository usuarioRepository;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final TokenBlackList tokenBlackList;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    public User registerUser(UserRequestDTO userRequestDTO) {
-        User user = userMapper.convertToEntity(userRequestDTO);
-        return userRepository.save(user);
+    public TokenResponse login(LoginRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        User user = usuarioRepository.findByUsername(request.getUsername()).orElseThrow();
+        String token = jwtService.getToken(user, user);
+        return TokenResponse.builder()
+                .token(token)
+                .build();
     }
 
-    public User authenticateUser(UserAuthDTO userAuthDTO) {
-        User user = userRepository.findByUserEmail(userAuthDTO.getUserEmail())
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
-        if (!user.getPassword().equals(userAuthDTO.getPassword())) {
-            throw new UserNotFoundException("Contraseña incorrecta");
-        }
-        return user;
+    public TokenResponse addUsuario(User usuario) {
+        User user = User.builder()
+                .username(usuario.getUsername())
+                .password(passwordEncoder.encode(usuario.getPassword()))
+                .email(usuario.getEmail())
+                .build();
+
+        usuarioRepository.save(user);
+        String token = jwtService.getToken(user, user);
+        return TokenResponse.builder()
+                .token(token)
+                .build();
     }
 }

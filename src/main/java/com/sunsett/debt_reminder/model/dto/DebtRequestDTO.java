@@ -31,4 +31,11 @@ public class DebtRequestDTO {
 
     @NotNull(message = "El estado no puede estar vacío")
     private boolean status;
+
+    // Campos adicionales para InstallmentDebt
+    private BigDecimal capital;
+    private BigDecimal interes;
+    private BigDecimal cuota;
+    private int daysBetweenInstallments;
+    private int numberOfInstallments;
 }

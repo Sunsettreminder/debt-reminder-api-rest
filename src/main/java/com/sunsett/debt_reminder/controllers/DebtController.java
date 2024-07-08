@@ -19,9 +19,10 @@ public class DebtController {
     private DebtService debtService;
 
     @PostMapping("/user/{userId}")
-    public ResponseEntity<DebtResponseDTO> createDebt(@PathVariable Long userId, @RequestBody DebtRequestDTO debtRequestDTO) {
-        DebtResponseDTO savedDebt = debtService.saveDebt(userId, debtRequestDTO);
-        return ResponseEntity.ok(savedDebt);
+    public ResponseEntity<List<DebtResponseDTO>> createDebt(@PathVariable Long userId, @RequestBody DebtRequestDTO debtRequestDTO) {
+        System.out.println("Recibida solicitud de creación de deuda");
+        List<DebtResponseDTO> savedDebts = debtService.saveDebt(userId, debtRequestDTO);
+        return ResponseEntity.ok(savedDebts);
     }
 
     @GetMapping("/user/{userId}/month")
